@@ -1,40 +1,43 @@
 package main
 
 import (
+	"fmt"
+	"sync"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
-type metricsRegistry map[string]prometheus.Counter
+type metricsRegistry struct {
+	sync.Map
+}
 
-func (mr metricsRegistry) exist(name string) bool {
-	_, ok := mr[name]
+func (mr *metricsRegistry) getOrStore(c counter) (prometheus.Counter, error) {
+	promCounter, found := mr.Load(c.Name)
 
-	return ok
+	if found {
+		assertedCounter, ok := promCounter.(prometheus.Counter)
+		if !ok {
+			return nil, fmt.Errorf("unable to assert type of %+v", promCounter)
+		}
+		return assertedCounter, nil
+	}
+
+	return mr.register(c), nil
+}
+
+func (mr *metricsRegistry) register(c counter) prometheus.Counter {
+	promCounter := promauto.NewCounter(prometheus.CounterOpts{
+		Name:        c.Name,
+		Help:        c.Help,
+		ConstLabels: prometheus.Labels(c.ConstLabels),
+	})
+
+	mr.Store(c.Name, promCounter)
+
+	return promCounter
 }
 
 var (
-	metrics = metricsRegistry{}
+	registry = metricsRegistry{}
 )
-
-func (mr metricsRegistry) increment(name string) error {
-	if !mr.exist(name) {
-		mr.register(name, "")
-	}
-	mr[name].Inc()
-	return nil
-}
-
-func (mr metricsRegistry) register(name, help string) {
-	if mr.exist(name) {
-		// TODO: error?
-		return
-	}
-
-	counter := promauto.NewCounter(prometheus.CounterOpts{
-		Name: name,
-		Help: help,
-	})
-
-	mr[name] = counter
-}

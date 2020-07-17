@@ -60,6 +60,7 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/send-metrics", sendMetrics)
 
+	log.Println("Listeneing on " + addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 

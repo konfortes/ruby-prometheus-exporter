@@ -1,4 +1,4 @@
-module stam
+module ruby-prometheus-exporter-go
 
 go 1.13
 

@@ -4,7 +4,7 @@ on:
   create:
     tags:
       - v*
-  
+
 jobs:
   build-and-push:
     name: Build And Push

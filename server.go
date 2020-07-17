@@ -42,15 +42,27 @@ func sendMetrics(w http.ResponseWriter, req *http.Request) {
 		}
 
 		cntr := fromRequest(requestBody)
-		var promCounter prometheus.Counter
-		if promCounter, err = registry.getOrStore(cntr); err != nil {
+		var promCounter *prometheus.CounterVec
+		if promCounter, err = registry.getOrRegister(cntr); err != nil {
 			fmt.Printf("error finding metric: %s\n", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		promCounter.Inc()
-		w.WriteHeader(http.StatusOK)
+		// TODO: find better way to do that
+		promLabels := prometheus.Labels{}
+		for key, val := range cntr.Labels {
+			promLabels[key] = val
+		}
+
+		// promCounter.With(promLabels).Inc()
+
+		cardinalCounter, err := promCounter.GetMetricWith(promLabels)
+		if err != nil {
+			fmt.Println("ronen")
+			fmt.Println(err)
+		}
+		cardinalCounter.Inc()
 	}
 }
 

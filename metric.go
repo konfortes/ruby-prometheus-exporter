@@ -12,6 +12,8 @@ type counter struct {
 
 func fromRequest(request RequestBody) counter {
 	c := counter{}
+	c.ConstLabels = make(metricLabels)
+	c.Labels = make(metricLabels)
 
 	for key, val := range request.CustomLabels {
 		c.ConstLabels[key] = val

@@ -10,6 +10,15 @@ type counter struct {
 	Value       int
 }
 
+func (c counter) labelKeys() []string {
+	keys := []string{}
+	for key := range c.Labels {
+		keys = append(keys, key)
+	}
+
+	return keys
+}
+
 func fromRequest(request RequestBody) counter {
 	c := counter{}
 	c.ConstLabels = make(metricLabels)

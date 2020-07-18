@@ -9,5 +9,5 @@ RUN go build -a
 FROM alpine AS final
 WORKDIR /
 COPY --from=builder /workspace/ruby-prometheus-exporter-go .
-EXPOSE 3000
+EXPOSE 9394
 CMD [ "./ruby-prometheus-exporter-go" ]

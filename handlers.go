@@ -32,6 +32,6 @@ func sendMetrics(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		promCounter.Inc()
+		promCounter.Add(float64(cntr.Value))
 	}
 }

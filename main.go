@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	_ "go.uber.org/automaxprocs"
+
 	"github.com/konfortes/go-server-utils/server"
 	"github.com/konfortes/go-server-utils/utils"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
